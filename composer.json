@@ -1,0 +1,40 @@
+{
+    "name": "ctroms/retryable",
+    "description": "Easily determine and retry fails requests with configuratble strategies",
+    "type": "package",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Chris Trombley",
+            "email": "ctroms@gmail.com"
+        }
+    ],
+    "require": {
+        "laravel/framework": "^5.0.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "~3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ctroms\\Retryable\\" : "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ctroms\\Retryable\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Ctroms\\Retryable\\RetryableServiceProvider"
+            ],
+            "aliases": {
+                "Retry": "Ctroms\\Retryable\\RetryFacade"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
