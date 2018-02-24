@@ -2,19 +2,22 @@
 
 namespace App;
 
+use \Facades\App\SleeperContract as Sleeper;
+
 class Retry
 {
     public function dynamic()
     {
 
     }
+
     public function constant($callback)
     {
         beginning:
         try {
             return $callback();
         } catch (\Throwable $e) {
-            sleep(1);
+            Sleeper::sleep(1);
             goto beginning;
         }
     }
@@ -26,7 +29,7 @@ class Retry
         try {
             return $callback();
         } catch (\Throwable $e) {
-            sleep($sleep++);
+            Sleeper::sleep($sleep++);
             goto beginning;
         }
     }
@@ -39,7 +42,7 @@ class Retry
         try {
             return $callback();
         } catch (\Throwable $e) {
-            sleep($base * pow(2, $attempt));
+            Sleeper::sleep($base * pow(2, $attempt));
             $attempt++;
             goto beginning;
         }

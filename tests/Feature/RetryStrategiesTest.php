@@ -2,14 +2,32 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
+use App\SleeperContract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
+use Tests\TestCase;
 
-class ExampleTest extends TestCase
+class RetryStrategiesTest extends TestCase
 {
     protected $times = [];
     protected $tries;
     protected $startTime;
+
+    public function setup()
+    {
+        parent::setup();
+        Carbon::setTestNow(Carbon::now());
+        $this->app->bind(
+            'App\SleeperContract',
+            'App\TestSleeper'
+        );
+    }
+
+    public function tearDown()
+    {
+        Carbon::setTestNow();
+        parent::teardown();
+    }
 
     /** @test */
     public function test_the_function_with_the_poop_name()
@@ -58,7 +76,7 @@ class ExampleTest extends TestCase
         return function () use ($sleeps) {
             $this->tries++;
             $hold = $this->startTime;
-            $this->startTime = microtime(true);
+            $this->startTime = Carbon::now()->second;
             $this->times[] = (int)round($this->startTime - $hold);
 
             if ($this->tries !== count($sleeps) + 1) {
