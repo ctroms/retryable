@@ -6,7 +6,7 @@ use \Facades\App\SleeperContract as Sleeper;
 
 class Retry
 {
-    public function dynamic()
+    public function auto()
     {
 
     }

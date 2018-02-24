@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 
 class TestSleeper implements SleeperContract
 {

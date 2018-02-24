@@ -1,37 +1,39 @@
 <?php
 
-namespace Tests\Feature;
+namespace Feature;
 
-use Illuminate\Support\Carbon;
+use App\SleeperContract;
+use App\TestSleeper;
+use Carbon\Carbon;
+use Facades\App\Retry;
 use Tests\TestCase;
 
 class RetryStrategiesTest extends TestCase
 {
-    protected $times = [];
-    protected $tries;
-    protected $startTime;
+    protected $measuredDelays = [];
+    protected $retryCount;
+    protected $lastRetryTime;
 
     public function setup()
     {
         parent::setup();
+
         Carbon::setTestNow(Carbon::now());
-        $this->app->bind(
-            'App\SleeperContract',
-            'App\TestSleeper'
-        );
+
+        $this->app->bind(SleeperContract::class, TestSleeper::class);
     }
 
     public function tearDown()
     {
         Carbon::setTestNow();
+
         parent::teardown();
     }
 
-    /** @test */
-    public function test_the_function_with_the_poop_name()
+    public function test_auto_detecting_a_strategy()
     {
         $this->markTestIncomplete('WIP');
-        \Facades\App\Retry::dynamic(function () {
+        Retry::auto(function () {
             // Do Something.
         }, [
             400 => Retry::CONSTANT,
@@ -41,43 +43,41 @@ class RetryStrategiesTest extends TestCase
 
     public function test_constant_strategy()
     {
-        $sleeps = [1, 1, 1, 1];
+        $delays = [1, 1, 1, 1];
 
-        \Facades\App\Retry::constant($this->getCallbackFromSleeps($sleeps));
+        Retry::constant($this->getCallbackFromDelays($delays));
 
-        array_shift($this->times);
-        $this->assertEquals($sleeps, $this->times);
+        $this->assertEquals($delays, $this->measuredDelays);
     }
 
     public function test_linear_strategy()
     {
-        $sleeps = [1, 2, 3, 4];
+        $delays = [1, 2, 3, 4];
 
-        \Facades\App\Retry::linear($this->getCallbackFromSleeps($sleeps));
+        Retry::linear($this->getCallbackFromDelays($delays));
 
-        array_shift($this->times);
-        $this->assertEquals($sleeps, $this->times);
+        $this->assertEquals($delays, $this->measuredDelays);
     }
 
     public function test_exponential_strategy()
     {
-        $sleeps = [2, 4, 8, 16];
+        $delays = [2, 4, 8, 16];
 
-        \Facades\App\Retry::exponential($this->getCallbackFromSleeps($sleeps));
+        Retry::exponential($this->getCallbackFromDelays($delays));
 
-        array_shift($this->times);
-        $this->assertEquals($sleeps, $this->times);
+        $this->assertEquals($delays, $this->measuredDelays);
     }
 
-    public function getCallbackFromSleeps($sleeps)
+    public function getCallbackFromDelays($delays)
     {
-        return function () use ($sleeps) {
-            $this->tries++;
-            $hold = $this->startTime;
-            $this->startTime = Carbon::now()->timestamp;
-            $this->times[] = (int)round($this->startTime - $hold);
+        $this->retryCount = 1;
 
-            if ($this->tries !== count($sleeps) + 1) {
+        return function () use ($delays) {
+            $currentRetryTime = Carbon::now()->timestamp;
+            $this->retryCount++ > 1 && $this->measuredDelays[] = (int) $currentRetryTime - $this->lastRetryTime;
+
+            while ($this->retryCount < count($delays) + 2) {
+                $this->lastRetryTime = $currentRetryTime;
                 throw new \Exception;
             }
         };
