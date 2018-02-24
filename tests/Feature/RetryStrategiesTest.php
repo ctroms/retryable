@@ -1,9 +1,7 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Feature;
 
-use App\SleeperContract;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
