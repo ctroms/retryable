@@ -76,7 +76,7 @@ class RetryStrategiesTest extends TestCase
         return function () use ($sleeps) {
             $this->tries++;
             $hold = $this->startTime;
-            $this->startTime = Carbon::now()->second;
+            $this->startTime = Carbon::now()->timestamp;
             $this->times[] = (int)round($this->startTime - $hold);
 
             if ($this->tries !== count($sleeps) + 1) {
