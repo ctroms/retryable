@@ -43,6 +43,16 @@ class ExampleTest extends TestCase
         $this->assertEquals($sleeps, $this->times);
     }
 
+    public function test_exponential_strategy()
+    {
+        $sleeps = [2, 4, 8, 16];
+
+        \Facades\App\Retry::exponential($this->getCallbackFromSleeps($sleeps));
+
+        array_shift($this->times);
+        $this->assertEquals($sleeps, $this->times);
+    }
+
     public function getCallbackFromSleeps($sleeps)
     {
         return function () use ($sleeps) {
