@@ -7,7 +7,7 @@ use Ctroms\Retryable\Tests\TestCase;
 
 class DeciderTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

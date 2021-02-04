@@ -22,7 +22,7 @@ class RetryStrategiesTest extends TestCase
     protected $retryCount;
     protected $lastRetryTime;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -31,7 +31,7 @@ class RetryStrategiesTest extends TestCase
         $this->app->bind(SleeperContract::class, TestSleeper::class);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         Carbon::setTestNow();
 
